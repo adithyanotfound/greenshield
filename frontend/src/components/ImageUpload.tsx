@@ -36,7 +36,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onAnalysis }) => {
       const response = await axios.post("http://localhost:3000/api/analyze", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
-      onAnalysis(response.data.analysis)
+      onAnalysis(response.data.analysis) // This line will trigger the step change
     } catch (error) {
       setError("Error analyzing image. Please try again.")
       console.error("Error:", error)
