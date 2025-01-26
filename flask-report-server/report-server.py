@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import pymupdf
 import pytesseract
 from PIL import Image
@@ -6,6 +7,7 @@ import io
 import os
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 def pdf_to_text_with_graphics(pdf_path):
     try:
