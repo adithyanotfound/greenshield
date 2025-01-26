@@ -2,6 +2,7 @@ import type React from "react"
 import { useState } from "react"
 import axios from "axios"
 import { CloudArrowUpIcon } from "@heroicons/react/24/solid"
+import { ADS_SERVER_URL } from "../config"
 
 interface ImageUploadProps {
   onAnalysis: (analysis: any) => void
@@ -33,7 +34,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onAnalysis }) => {
     formData.append("image", file)
 
     try {
-      const response = await axios.post("http://localhost:3000/api/analyze", formData, {
+      const response = await axios.post(`${ADS_SERVER_URL}/api/analyze`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       onAnalysis(response.data.analysis) // This line will trigger the step change

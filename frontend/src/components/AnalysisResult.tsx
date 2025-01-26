@@ -1,6 +1,7 @@
 import type React from "react"
 import { useState } from "react"
 import axios from "axios"
+import { ADS_SERVER_URL } from "../config"
 
 interface AnalysisResultProps {
   imageAnalysis: any
@@ -17,7 +18,7 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({ imageAnalysis, r
     setError(null)
 
     try {
-      const response = await axios.post("http://localhost:3000/api/report", {
+      const response = await axios.post(`${ADS_SERVER_URL}/api/report`, {
         analysis: imageAnalysis,
         reportData: reportAnalysis,
       })

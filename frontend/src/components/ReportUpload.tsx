@@ -2,6 +2,7 @@ import type React from "react"
 import { useState } from "react"
 import axios from "axios"
 import { DocumentArrowUpIcon } from "@heroicons/react/24/solid"
+import { REPORT_SERVER_URL } from "../config"
 
 interface ReportUploadProps {
   onAnalysis: (analysis: any) => void
@@ -33,7 +34,7 @@ export const ReportUpload: React.FC<ReportUploadProps> = ({ onAnalysis }) => {
     formData.append("pdf", file)
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/extract", formData, {
+      const response = await axios.post(`${REPORT_SERVER_URL}/extract`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       onAnalysis(response.data.extracted_text)
