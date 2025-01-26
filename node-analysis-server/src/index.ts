@@ -101,7 +101,7 @@ app.post("/api/report", async (req, res) => {
         ${analysis}
         This is the text content extracted from reports published by the company.
         ${reportData}
-        Considering the reports to be true list down the positive aspects, possible greenwashing indicators (selective disclosure, lack of full transparency, exaggerated/ false claims etc..) and the verdict for potential greenwashing.
+        Considering the reports to be true list down the positive aspects, possible greenwashing indicators and the verdict for potential greenwashing.
         Support your answer with reason.
     `);
   res.json({
