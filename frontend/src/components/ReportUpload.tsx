@@ -33,7 +33,7 @@ export const ReportUpload: React.FC<ReportUploadProps> = ({ onAnalysis }) => {
     formData.append("pdf", file)
 
     try {
-      const response = await axios.post("http://localhost:5000/extract", formData, {
+      const response = await axios.post("http://127.0.0.1:5000/extract", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       onAnalysis(response.data.extracted_text)

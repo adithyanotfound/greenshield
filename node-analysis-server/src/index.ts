@@ -39,7 +39,7 @@ function fileToGenerativePart(path: fs.PathOrFileDescriptor, mimeType: string) {
 
 async function analyzeImage(imagePath: string) {
   const model: GenerativeModel = genAI.getGenerativeModel({
-    model: "models/gemini-1.5-pro",
+    model: "models/gemini-1.5-flash",
     systemInstruction: "You are an expert at detect greenwashing.",
   });
   const result = await model.generateContent([
@@ -93,7 +93,7 @@ app.post("/api/report", async (req, res) => {
   const reportData = req.body.reportData;
 
   const model: GenerativeModel = genAI.getGenerativeModel({
-    model: "models/gemini-1.5-pro",
+    model: "models/gemini-1.5-flash",
     systemInstruction: "You are an expert at detect greenwashing.",
   });
   const result = await model.generateContent(`
