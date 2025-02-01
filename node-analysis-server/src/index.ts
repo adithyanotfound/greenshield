@@ -37,19 +37,31 @@ function fileToGenerativePart(path: fs.PathOrFileDescriptor, mimeType: string) {
   };
 }
 
-async function analyzeImage(imagePath: string) {
+async function analyzeImage(imagePath1: string, image2Path?: string) {
   const model: GenerativeModel = genAI.getGenerativeModel({
-    model: "models/gemini-1.5-flash",
+    model: "models/gemini-1.5-pro",
     systemInstruction: "You are an expert at detect greenwashing.",
   });
-  const result = await model.generateContent([
-    fileToGenerativePart(imagePath, "image/jpeg"),
-    `Take a look at the image and tell whether this is potential greenwashing. Support your answer with reason. The response should be in JSON format { companyName: "", analysis:"" }. Do not return anything else.`,
-  ]);
+
+  let result;
+  if (!image2Path) {
+    // Analyze single image
+    result = await model.generateContent([
+      fileToGenerativePart(imagePath1, "image/jpeg"),
+      `Take a look at the image and tell whether this is potential greenwashing. The image might include ingredients of the product. Use the ingredients to assist in your analysis. Support your answer with reason. The response should be in JSON format { companyName: "", analysis:"" }. Do not return anything else.`,
+    ]);
+  } else {
+    // Analyze two images
+    result = await model.generateContent([
+      fileToGenerativePart(imagePath1, "image/jpeg"),
+      fileToGenerativePart(image2Path, "image/jpeg"),
+      `Take a look at the images and tell whether this is potential greenwashing. The images might include ingredients of the product. Use the ingredients to assist in your analysis. Support your answer with reason. The response should be in JSON format { companyName: "", analysis:"" }. Do not return anything else.`,
+    ]);
+  }
   return result.response.text();
 }
 
-//file-upload
+// File storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = "uploads/";
@@ -65,27 +77,40 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-//route of analysing advertisements
+// Route for analyzing advertisements with one or two images (using a single key: "images")
 app.post(
   "/api/analyze",
-  upload.single("image"),
+  upload.array("image", 2), // Accept up to 2 files under "images"
   async (req, res): Promise<any> => {
     try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No image file uploaded" });
+      const files = req.files as Express.Multer.File[];
+
+      if (!files || files.length === 0) {
+        return res.status(400).json({ error: "At least one image must be uploaded" });
       }
 
-      const imagePath = req.file.path;
-      console.log(imagePath);
-      const result = await analyzeImage(imagePath);
+      let analysisResult;
+      if (files.length === 1) {
+        // Only one image uploaded
+        analysisResult = await analyzeImage(files[0].path);
+      } else if (files.length === 2) {
+        // Two images uploaded
+        analysisResult = await analyzeImage(files[0].path, files[1].path);
+      }
 
-      res.json({ analysis: parseJSONString(result) });
+      if (analysisResult) {
+        res.json(parseJSONString(analysisResult));
+      } else {
+        res.status(500).json({ error: "Analysis result is undefined" });
+      }
     } catch (error) {
-      console.error("Error processing image:", error);
-      res.status(500).json({ error: "Error processing image" });
+      console.error("Error processing images:", error);
+      res.status(500).json({ error: "Error processing images" });
     }
-  },
+  }
 );
+
+
 
 //route for analysing report and giving the final verdict
 app.post("/api/report", async (req, res) => {
